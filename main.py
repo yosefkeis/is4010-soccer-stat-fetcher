@@ -7,7 +7,8 @@ import requests
 from dotenv import load_dotenv
 
 
-API_URL = "https://api.football-data.org/v4/competitions/PL/standings"
+API_URL_STANDINGS = "https://api.football-data.org/v4/competitions/PL/standings"
+API_URL_MATCHES = "https://api.football-data.org/v4/matches"
 
 
 def load_api_token() -> str:
@@ -19,10 +20,10 @@ def load_api_token() -> str:
     return token
 
 
-def fetch_pl_standings(api_token: str) -> Any:
+def fetch_data(api_token: str, url: str) -> Any:
     headers = {"X-Auth-Token": api_token}
     try:
-        response = requests.get(API_URL, headers=headers, timeout=10)
+        response = requests.get(url, headers=headers, timeout=10)
     except requests.RequestException as error:
         raise ConnectionError(f"Failed to connect to Football Data API: {error}") from error
 
@@ -37,6 +38,14 @@ def fetch_pl_standings(api_token: str) -> Any:
     raise RuntimeError(
         f"Unexpected API response: {response.status_code} {response.reason}"
     )
+
+
+def fetch_pl_standings(api_token: str) -> Any:
+    return fetch_data(api_token, API_URL_STANDINGS)
+
+
+def fetch_matches(api_token: str) -> Any:
+    return fetch_data(api_token, API_URL_MATCHES)
 
 
 def format_standing_row(row: Any) -> str:
@@ -58,33 +67,48 @@ def validate_top(top: int) -> int:
     return top
 
 
-def print_standings(data: Any, top: int) -> None:
-    standings = data.get("standings")
-    if not standings:
-        print("No standings data was returned by the API.")
+def print_matches(data: Any, limit: int) -> None:
+    matches = data.get("matches", [])
+    if not matches:
+        print("No matches data was returned by the API.")
         return
 
-    table = standings[0].get("table", [])
-    if not table:
-        print("The standings format is not what was expected.")
-        return
-
-    print("Premier League Standings")
-    print("Position | Team | Played | Won | Drawn | Lost | Points")
-    print("---------|------|--------|-----|-------|------|-------")
-    for row in table[:top]:
-        print(format_standing_row(row))
+    print("Recent Premier League Matches")
+    print("Date | Home Team | Away Team | Score")
+    print("-----|----------|-----------|------")
+    for match in matches[:limit]:
+        home_team = match.get("homeTeam", {}).get("name", "Unknown")
+        away_team = match.get("awayTeam", {}).get("name", "Unknown")
+        score = match.get("score", {})
+        full_time = score.get("fullTime", {})
+        home_score = full_time.get("home", "N/A")
+        away_score = full_time.get("away", "N/A")
+        score_str = f"{home_score}-{away_score}" if home_score != "N/A" else "TBD"
+        utc_date = match.get("utcDate", "")
+        date = utc_date[:10] if utc_date else "Unknown"
+        print(f"{date} | {home_team[:20]:<20} | {away_team[:20]:<20} | {score_str}")
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Fetch Premier League standings from the Football Data API."
+        description="Fetch Premier League standings or matches from the Football Data API."
     )
     parser.add_argument(
         "--top",
         type=int,
         default=10,
-        help="Number of top teams to display from the standings.",
+        help="Number of top teams to display in standings (default: 10).",
+    )
+    parser.add_argument(
+        "--matches",
+        action="store_true",
+        help="Fetch recent matches instead of standings.",
+    )
+    parser.add_argument(
+        "--limit",
+        type=int,
+        default=10,
+        help="Number of matches to display (default: 10).",
     )
     return parser.parse_args()
 
@@ -94,10 +118,15 @@ def main() -> int:
     args = parse_args()
 
     try:
-        top = validate_top(args.top)
         api_token = load_api_token()
-        data = fetch_pl_standings(api_token)
-        print_standings(data, top)
+        if args.matches:
+            limit = validate_top(args.limit)  # Reuse validation
+            data = fetch_matches(api_token)
+            print_matches(data, limit)
+        else:
+            top = validate_top(args.top)
+            data = fetch_pl_standings(api_token)
+            print_standings(data, top)
         return 0
     except ValueError as error:
         print(f"Configuration error: {error}")

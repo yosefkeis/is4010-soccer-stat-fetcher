@@ -16,3 +16,9 @@
 - **Task**: Maximize rubric score with edge-case tests and CLI validation.
 - **AI Tool**: GitHub Copilot / VS Code AI.
 - **Collaboration**: AI suggested additional validation and edge-case handling. I expanded the test suite to include network failures, invalid top flags, and malformed API responses, and I improved README setup details.
+
+## April 28, 2026
+- **Task**: Added matches fetching feature.
+- **AI Tool**: GitHub Copilot / VS Code AI.
+- **Collaboration**: AI helped add a new `--matches` flag and `fetch_matches` function to extend the CLI beyond standings.
+- **What I learned**: Extending CLI tools with new features requires careful integration of API calls and output formatting.

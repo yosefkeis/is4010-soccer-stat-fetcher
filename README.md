@@ -37,6 +37,18 @@ Show only the top 5 teams:
 python main.py --top 5
 ```
 
+Fetch recent matches:
+
+```bash
+python main.py --matches
+```
+
+Show the last 5 matches:
+
+```bash
+python main.py --matches --limit 5
+```
+
 ## Examples
 
 Display the default top standings:
@@ -71,6 +83,21 @@ Expected output:
 
 ```text
 Configuration error: API token not found. Create a .env file with FOOTBALL_DATA_API_TOKEN=your_token
+```
+
+Display recent matches:
+
+```bash
+python main.py --matches --limit 3
+```
+
+Expected output:
+
+```text
+Recent Premier League Matches
+Date | Home Team | Away Team | Score
+-----|----------|-----------|------
+2024-04-28 | Arsenal | Chelsea | 2-1
 ```
 
 ## Tests
