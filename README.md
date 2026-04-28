@@ -122,10 +122,10 @@ Expected output:
 
 ```text
 Top Premier League Scorers
-Player | Team | Goals
--------|------|------
-Erling Haaland | Manchester City | 20
-Son Heung-min | Tottenham | 15
+Player | Team | Goals | Assists
+-------|------|-------|--------
+Erling Haaland | Manchester City |    24 |      7
+Son Heung-min | Tottenham |    15 |      5
 ```
 
 ## Tests

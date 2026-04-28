@@ -119,13 +119,14 @@ def print_scorers(data: Any, limit: int) -> None:
         return
 
     print("Top Premier League Scorers")
-    print("Player | Team | Goals")
-    print("-------|------|------")
+    print("Player | Team | Goals | Assists")
+    print("-------|------|-------|--------")
     for scorer in scorers[:limit]:
         player = scorer.get("player", {}).get("name", "Unknown")
         team = scorer.get("team", {}).get("name", "Unknown")
         goals = scorer.get("goals", 0)
-        print(f"{player[:25]:<25} | {team[:20]:<20} | {goals}")
+        assists = scorer.get("assists", 0) or 0
+        print(f"{player[:25]:<25} | {team[:20]:<20} | {goals:>5} | {assists:>6}")
 
 
 def parse_args() -> argparse.Namespace:
