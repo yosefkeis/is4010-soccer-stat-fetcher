@@ -27,5 +27,4 @@ jobs:
           pip install -r requirements.txt pytest
 
       - name: Run tests
-        # We use 'python -m pytest' to fix the ModuleNotFoundError
         run: python -m pytest
