@@ -10,7 +10,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
-      # This tells GitHub to use Node 24 and ignore the deprecation warning
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
@@ -28,5 +27,5 @@ jobs:
           pip install -r requirements.txt pytest
 
       - name: Run tests
-        # Using 'python -m pytest' ensures the root directory is in the path
+        # We use 'python -m pytest' to fix the ModuleNotFoundError
         run: python -m pytest
