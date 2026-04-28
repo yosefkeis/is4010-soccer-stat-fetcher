@@ -1,39 +1,87 @@
 # is4010-soccer-stat-fetcher
-A Python-based CLI tool that fetches Premier League standings using the Football-Data API.
 
-## Setup
-1. Copy `.env.example` to `.env`.
-2. Add your API token to `.env`:
+A Python command-line tool that fetches Premier League standings from the Football-Data API. This tool is designed for fans or analysts who want a quick way to view the current league table from the command line without opening a browser.
+
+## What it does
+
+`is4010-soccer-stat-fetcher` calls the Football-Data API and prints the current Premier League standings, including position, team name, games played, wins, draws, losses, and points. It keeps the API token secure in a `.env` file and handles common problems like missing configuration or invalid credentials.
+
+## Installation
+
+1. Clone the repository.
+2. Copy `.env.example` to `.env`.
+3. Add your Football-Data API token to `.env`:
 
    ```text
    FOOTBALL_DATA_API_TOKEN=your_api_token_here
    ```
-3. Install dependencies:
+4. Install dependencies:
 
    ```bash
    pip install -r requirements.txt
    ```
 
-## Run
+## Usage
+
+Run the CLI to display the top Premier League clubs:
 
 ```bash
 python main.py
 ```
 
-You can show fewer or more top teams with `--top`:
+Show only the top 5 teams:
 
 ```bash
 python main.py --top 5
 ```
 
-## Notes
-- The API token is kept secret in `.env`, which is ignored by Git.
-- The code uses `main()` for organization and handles HTTP errors and missing configuration.
+## Examples
+
+Display the default top standings:
+
+```bash
+python main.py
+```
+
+Expected output:
+
+```text
+Premier League Standings
+Position | Team | Played | Won | Drawn | Lost | Points
+---------|------|--------|-----|-------|------|-------
+       1 | Arsenal                 |      5 |   4 |     1 |    0 |      13
+       2 | Manchester City         |      5 |   4 |     0 |    1 |      12
+```
+
+Display the top 3 teams only:
+
+```bash
+python main.py --top 3
+```
+
+Display errors when the API token is missing:
+
+```bash
+python main.py
+```
+
+Expected output:
+
+```text
+Configuration error: API token not found. Create a .env file with FOOTBALL_DATA_API_TOKEN=your_token
+```
 
 ## Tests
+
+Run the test suite with:
 
 ```bash
 pytest
 ```
 
-The repository also includes a GitHub Actions workflow at `.github/workflows/tests.yml` that runs `pytest` on every push and pull request to `main`.
+This repository includes a GitHub Actions workflow at `.github/workflows/tests.yml` that installs dependencies and runs `pytest` on every push and pull request to `main`.
+
+## Limitations and future ideas
+
+- Currently only fetches the Premier League standings.
+- Future improvements could include match scores, team statistics, or support for other competitions.
