@@ -39,6 +39,25 @@ def fetch_pl_standings(api_token: str) -> Any:
     )
 
 
+def format_standing_row(row: Any) -> str:
+    team_name = row.get("team", {}).get("name", "Unknown")
+    return (
+        f"{row.get('position', 0):>8} | "
+        f"{team_name[:25]:<25} | "
+        f"{row.get('playedGames', 0):>6} | "
+        f"{row.get('won', 0):>3} | "
+        f"{row.get('draw', 0):>5} | "
+        f"{row.get('lost', 0):>4} | "
+        f"{row.get('points', 0):>6}"
+    )
+
+
+def validate_top(top: int) -> int:
+    if top <= 0:
+        raise ValueError("--top must be a positive integer")
+    return top
+
+
 def print_standings(data: Any, top: int) -> None:
     standings = data.get("standings")
     if not standings:
@@ -54,15 +73,7 @@ def print_standings(data: Any, top: int) -> None:
     print("Position | Team | Played | Won | Drawn | Lost | Points")
     print("---------|------|--------|-----|-------|------|-------")
     for row in table[:top]:
-        print(
-            f"{row.get('position'):>8} | "
-            f"{row.get('team', {}).get('name', 'Unknown')[:25]:<25} | "
-            f"{row.get('playedGames', 0):>6} | "
-            f"{row.get('won', 0):>3} | "
-            f"{row.get('draw', 0):>5} | "
-            f"{row.get('lost', 0):>4} | "
-            f"{row.get('points', 0):>6}"
-        )
+        print(format_standing_row(row))
 
 
 def parse_args() -> argparse.Namespace:
@@ -83,9 +94,10 @@ def main() -> int:
     args = parse_args()
 
     try:
+        top = validate_top(args.top)
         api_token = load_api_token()
         data = fetch_pl_standings(api_token)
-        print_standings(data, args.top)
+        print_standings(data, top)
         return 0
     except ValueError as error:
         print(f"Configuration error: {error}")

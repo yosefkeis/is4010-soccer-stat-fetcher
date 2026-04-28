@@ -14,8 +14,7 @@ A Python command-line tool that fetches Premier League standings from the Footba
 
    ```text
    FOOTBALL_DATA_API_TOKEN=your_api_token_here
-   ```
-4. Install dependencies:
+   ```   You can request a free token by signing up at https://www.football-data.org/.4. Install dependencies:
 
    ```bash
    pip install -r requirements.txt

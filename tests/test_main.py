@@ -1,8 +1,9 @@
 import os
+import requests
 
 import pytest
 
-from main import API_URL, fetch_pl_standings, load_api_token, print_standings
+from main import API_URL, fetch_pl_standings, load_api_token, print_standings, validate_top
 
 
 class DummyResponse:
@@ -50,6 +51,25 @@ def test_fetch_pl_standings_unauthorized(monkeypatch):
         fetch_pl_standings("bad-token")
 
 
+def test_fetch_pl_standings_network_error(monkeypatch):
+    def fake_get(url, headers, timeout):
+        raise requests.RequestException("timeout")
+
+    monkeypatch.setattr("requests.get", fake_get)
+
+    with pytest.raises(ConnectionError, match="Failed to connect"):
+        fetch_pl_standings("test-token")
+
+
+def test_validate_top_invalid():
+    with pytest.raises(ValueError, match="--top must be a positive integer"):
+        validate_top(0)
+
+
+def test_validate_top_valid():
+    assert validate_top(3) == 3
+
+
 def test_print_standings_outputs_expected_lines(capsys):
     data = {
         "standings": [
@@ -73,3 +93,15 @@ def test_print_standings_outputs_expected_lines(capsys):
     captured = capsys.readouterr()
     assert "Premier League Standings" in captured.out
     assert "Team A" in captured.out
+
+
+def test_print_standings_no_data(capsys):
+    print_standings({}, top=3)
+    captured = capsys.readouterr()
+    assert "No standings data was returned by the API." in captured.out
+
+
+def test_print_standings_invalid_table(capsys):
+    print_standings({"standings": [{}]}, top=3)
+    captured = capsys.readouterr()
+    assert "The standings format is not what was expected." in captured.out
