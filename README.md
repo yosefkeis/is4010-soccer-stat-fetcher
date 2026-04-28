@@ -49,6 +49,18 @@ Show the last 5 matches:
 python main.py --matches --limit 5
 ```
 
+Fetch top scorers:
+
+```bash
+python main.py --scorers
+```
+
+Show the top 10 scorers:
+
+```bash
+python main.py --scorers --limit 10
+```
+
 ## Examples
 
 Display the default top standings:
@@ -98,6 +110,22 @@ Recent Premier League Matches
 Date | Home Team | Away Team | Score
 -----|----------|-----------|------
 2024-04-28 | Arsenal | Chelsea | 2-1
+```
+
+Display top scorers:
+
+```bash
+python main.py --scorers --limit 5
+```
+
+Expected output:
+
+```text
+Top Premier League Scorers
+Player | Team | Goals
+-------|------|------
+Erling Haaland | Manchester City | 20
+Son Heung-min | Tottenham | 15
 ```
 
 ## Tests

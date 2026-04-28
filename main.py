@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 
 API_URL_STANDINGS = "https://api.football-data.org/v4/competitions/PL/standings"
 API_URL_MATCHES = "https://api.football-data.org/v4/matches"
+API_URL_SCORERS = "https://api.football-data.org/v4/competitions/PL/scorers"
 
 
 def load_api_token() -> str:
@@ -48,6 +49,10 @@ def fetch_matches(api_token: str) -> Any:
     return fetch_data(api_token, API_URL_MATCHES)
 
 
+def fetch_scorers(api_token: str) -> Any:
+    return fetch_data(api_token, API_URL_SCORERS)
+
+
 def format_standing_row(row: Any) -> str:
     team_name = row.get("team", {}).get("name", "Unknown")
     return (
@@ -65,6 +70,24 @@ def validate_top(top: int) -> int:
     if top <= 0:
         raise ValueError("--top must be a positive integer")
     return top
+
+
+def print_standings(data: Any, top: int) -> None:
+    standings = data.get("standings")
+    if not standings:
+        print("No standings data was returned by the API.")
+        return
+
+    table = standings[0].get("table", [])
+    if not table:
+        print("The standings format is not what was expected.")
+        return
+
+    print("Premier League Standings")
+    print("Position | Team | Played | Won | Drawn | Lost | Points")
+    print("---------|------|--------|-----|-------|------|-------")
+    for row in table[:top]:
+        print(format_standing_row(row))
 
 
 def print_matches(data: Any, limit: int) -> None:
@@ -89,9 +112,25 @@ def print_matches(data: Any, limit: int) -> None:
         print(f"{date} | {home_team[:20]:<20} | {away_team[:20]:<20} | {score_str}")
 
 
+def print_scorers(data: Any, limit: int) -> None:
+    scorers = data.get("scorers", [])
+    if not scorers:
+        print("No scorers data was returned by the API.")
+        return
+
+    print("Top Premier League Scorers")
+    print("Player | Team | Goals")
+    print("-------|------|------")
+    for scorer in scorers[:limit]:
+        player = scorer.get("player", {}).get("name", "Unknown")
+        team = scorer.get("team", {}).get("name", "Unknown")
+        goals = scorer.get("goals", 0)
+        print(f"{player[:25]:<25} | {team[:20]:<20} | {goals}")
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Fetch Premier League standings or matches from the Football Data API."
+        description="Fetch Premier League standings, matches, or scorers from the Football Data API."
     )
     parser.add_argument(
         "--top",
@@ -105,10 +144,15 @@ def parse_args() -> argparse.Namespace:
         help="Fetch recent matches instead of standings.",
     )
     parser.add_argument(
+        "--scorers",
+        action="store_true",
+        help="Fetch top scorers instead of standings.",
+    )
+    parser.add_argument(
         "--limit",
         type=int,
         default=10,
-        help="Number of matches to display (default: 10).",
+        help="Number of matches or scorers to display (default: 10).",
     )
     return parser.parse_args()
 
@@ -123,6 +167,10 @@ def main() -> int:
             limit = validate_top(args.limit)  # Reuse validation
             data = fetch_matches(api_token)
             print_matches(data, limit)
+        elif args.scorers:
+            limit = validate_top(args.limit)
+            data = fetch_scorers(api_token)
+            print_scorers(data, limit)
         else:
             top = validate_top(args.top)
             data = fetch_pl_standings(api_token)

@@ -22,3 +22,9 @@
 - **AI Tool**: GitHub Copilot / VS Code AI.
 - **Collaboration**: AI helped add a new `--matches` flag and `fetch_matches` function to extend the CLI beyond standings.
 - **What I learned**: Extending CLI tools with new features requires careful integration of API calls and output formatting.
+
+## April 28, 2026
+- **Task**: Added top scorers feature.
+- **AI Tool**: GitHub Copilot / VS Code AI.
+- **Collaboration**: AI helped add `--scorers` flag and `fetch_scorers` function for player statistics.
+- **What I learned**: Adding multiple data sources enhances the tool's utility while maintaining clean code structure.
