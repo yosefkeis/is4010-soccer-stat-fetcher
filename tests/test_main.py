@@ -3,7 +3,7 @@ import requests
 
 import pytest
 
-from main import API_URL, fetch_pl_standings, load_api_token, print_standings, validate_top
+from main import API_URL_STANDINGS, fetch_pl_standings, load_api_token, print_standings, validate_top
 
 
 class DummyResponse:
@@ -32,7 +32,7 @@ def test_fetch_pl_standings_success(monkeypatch):
     dummy_data = {"standings": [{"table": [{"position": 1, "team": {"name": "Team A"}, "playedGames": 1, "won": 1, "draw": 0, "lost": 0, "points": 3}]}]}
 
     def fake_get(url, headers, timeout):
-        assert url == API_URL
+        assert url == API_URL_STANDINGS
         assert headers == {"X-Auth-Token": "test-token"}
         assert timeout == 10
         return DummyResponse(200, dummy_data)
